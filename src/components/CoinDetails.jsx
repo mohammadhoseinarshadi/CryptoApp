@@ -1,6 +1,10 @@
+import React from 'react';
 import { useParams, useLocation } from "react-router-dom";
 import { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import Header from './Header.jsx';
+import Footer from './Footer.jsx';
+import styles from './CoinDetails.module.css';
 
 const CoinDetails = () => {
   const { coinId } = useParams();
@@ -21,32 +25,41 @@ const CoinDetails = () => {
     fetchData();
   }, [location]);
 
-  console.log("%c Line:5 🥛 params", "color:#e41a6a", coinId);
-
-  if (!coinData) {
-    return <div>Loading...</div>;
-  }
-
-  // Prepare data for the chart (e.g., price over time)
-  const chartData = {
-    labels: coinData.market_data.sparkline_7d ? coinData.market_data.sparkline_7d.price.map((_, index) => index) : [],
-    datasets: [
-      {
-        label: `${coinData.name} Price (7 Days)`,
-        data: coinData.market_data.sparkline_7d ? coinData.market_data.sparkline_7d.price : [],
-        fill: false,
-        backgroundColor: 'rgb(75, 192, 192)',
-        borderColor: 'rgba(75, 192, 192, 0.2)',
-      },
-    ],
-  };
-
   return (
-    <div>
-      <h2>{coinData.name} ({coinData.symbol.toUpperCase()})</h2>
-      <p>Current Price: ${coinData.market_data.current_price.usd}</p>
-      <p>Market Cap Rank: {coinData.market_cap_rank}</p>
-      <Line data={chartData} key={coinId} />
+    <div className={styles.coinDetails}>
+      <Header />
+      <div className={styles.container}>
+        <h1 className={styles.title}>Coin Details</h1>
+        {coinData && (
+          <div className={styles.details}>
+            <h2 className={styles.name}>{coinData.name} ({coinData.symbol.toUpperCase()})</h2>
+            <p className={styles.price}>Current Price: {coinData.market_data.current_price.usd}</p>
+            {/* Add more details as needed */}
+
+            {/* Chart */}
+            <div className={styles.chartContainer}>
+              <h3 className={styles.chartTitle}>Price History</h3>
+              {coinData.market_data.sparkline_7d && (
+                <LineChart width={600} height={300} data={coinData.market_data.sparkline_7d.price}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                </LineChart>
+              )}
+            </div>
+            
+            {/* Live Price */}
+            <div className={styles.livePrice}>
+              <h3 className={styles.livePriceTitle}>Live Price</h3>
+              <p className={styles.livePriceValue}>$ {coinData.market_data.current_price.usd}</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 };

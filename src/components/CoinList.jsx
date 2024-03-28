@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactDOM from "react-dom/client";
 import { css } from '@emotion/css';
 import { coinData } from './coin-data';
 import { DataGrid } from '@mui/x-data-grid';
